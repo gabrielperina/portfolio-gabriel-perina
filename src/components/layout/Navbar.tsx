@@ -1,6 +1,6 @@
 import { ExternalLink, X } from "lucide-react";
 import { useRouterState } from "@tanstack/react-router";
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type MouseEvent } from "react";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { useTheme } from "@/hooks/use-theme";
 import { useActiveSection } from "@/hooks/use-active-section";
@@ -8,7 +8,15 @@ import { Button } from "@/components/ui/button";
 import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
 import { useLanguage } from "@/i18n/LanguageProvider";
 
-const sectionIds = ["inicio", "sobre", "experiencia", "habilidades", "certificacoes", "projetos", "contato"] as const;
+const sectionIds = [
+  "inicio",
+  "sobre",
+  "experiencia",
+  "habilidades",
+  "certificacoes",
+  "projetos",
+  "contato",
+] as const;
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
@@ -67,13 +75,29 @@ export function Navbar() {
     if (isHome) setActive(anchor.slice(1));
     setOpen(false);
   };
+
+  const handleSectionClick = (event: MouseEvent<HTMLAnchorElement>, anchor: string) => {
+    onSelect(anchor);
+    if (!isHome) return;
+
+    const target = document.getElementById(anchor.slice(1));
+    if (!target) return;
+
+    event.preventDefault();
+    window.history.pushState(null, "", anchor);
+    const headerHeight = document.querySelector<HTMLElement>(".site-header")?.offsetHeight ?? 0;
+    const top = target.getBoundingClientRect().top + window.scrollY - headerHeight - 20;
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.scrollTo({ top: Math.max(0, top), behavior: prefersReducedMotion ? "auto" : "smooth" });
+  };
+
   const linkProps = (anchor: string) => {
     const current = isHome && active === anchor.slice(1);
     return {
       href: homeHref(anchor),
       className: current ? "is-active" : undefined,
       "aria-current": current ? ("location" as const) : undefined,
-      onClick: () => onSelect(anchor),
+      onClick: (event: MouseEvent<HTMLAnchorElement>) => handleSectionClick(event, anchor),
     };
   };
 
@@ -82,39 +106,96 @@ export function Navbar() {
       <nav className="nav-shell" aria-label={t.nav.mainLabel}>
         <div className="desktop-nav">
           <div className="nav-links">
-            {sections.map(([label, anchor]) => <a key={anchor} {...linkProps(anchor)}><span>{label}</span></a>)}
+            {sections.map(([label, anchor]) => (
+              <a key={anchor} {...linkProps(anchor)}>
+                <span>{label}</span>
+              </a>
+            ))}
           </div>
           <span className="nav-divider" aria-hidden="true" />
-          <a className="nav-external" href="https://www.linkedin.com/in/gabrielperina/" target="_blank" rel="noreferrer">LinkedIn <ExternalLink size={13} aria-hidden="true" /></a>
-          <LanguageSwitcher /><ThemeToggle theme={theme} onToggle={toggleTheme} />
+          <a
+            className="nav-external"
+            href="https://www.linkedin.com/in/gabrielperina/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            LinkedIn <ExternalLink size={13} aria-hidden="true" />
+          </a>
+          <LanguageSwitcher />
+          <ThemeToggle theme={theme} onToggle={toggleTheme} />
         </div>
         <div className="mobile-actions">
           <span className="mobile-brand">Gabriel Perina</span>
           <div className="mobile-actions-buttons">
-            <LanguageSwitcher /><ThemeToggle theme={theme} onToggle={toggleTheme} />
-            <Button ref={toggleRef} variant="ghost" size="icon" className={`icon-button menu-toggle ${open ? "is-open" : ""}`} onClick={() => setOpen((value) => !value)} aria-expanded={open} aria-controls="mobile-menu" aria-label={open ? t.nav.closeMenu : t.nav.openMenu}>
-              <span className="menu-toggle-lines" aria-hidden="true"><i /><i /><i /></span>
+            <LanguageSwitcher />
+            <ThemeToggle theme={theme} onToggle={toggleTheme} />
+            <Button
+              ref={toggleRef}
+              variant="ghost"
+              size="icon"
+              className={`icon-button menu-toggle ${open ? "is-open" : ""}`}
+              onClick={() => setOpen((value) => !value)}
+              aria-expanded={open}
+              aria-controls="mobile-menu"
+              aria-label={open ? t.nav.closeMenu : t.nav.openMenu}
+            >
+              <span className="menu-toggle-lines" aria-hidden="true">
+                <i />
+                <i />
+                <i />
+              </span>
             </Button>
           </div>
         </div>
       </nav>
-      <div className={`mobile-menu-backdrop ${open ? "is-open" : ""}`} onClick={() => setOpen(false)} aria-hidden="true" />
-      <div id="mobile-menu" className={`mobile-menu ${open ? "is-open" : ""}`} role="dialog" aria-modal="true" aria-label={t.nav.menuDialog} aria-hidden={!open} inert={!open}>
+      <div
+        className={`mobile-menu-backdrop ${open ? "is-open" : ""}`}
+        onClick={() => setOpen(false)}
+        aria-hidden="true"
+      />
+      <div
+        id="mobile-menu"
+        className={`mobile-menu ${open ? "is-open" : ""}`}
+        role="dialog"
+        aria-modal="true"
+        aria-label={t.nav.menuDialog}
+        aria-hidden={!open}
+        inert={!open}
+      >
         <div className="mobile-menu-header">
           <span className="eyebrow">{t.nav.menu}</span>
           <div className="mobile-actions-buttons">
-            <LanguageSwitcher /><ThemeToggle theme={theme} onToggle={toggleTheme} />
-            <Button ref={closeRef} variant="ghost" size="icon" className="icon-button" onClick={() => setOpen(false)} aria-label={t.nav.closeMenu}><X size={17} aria-hidden="true" /></Button>
+            <LanguageSwitcher />
+            <ThemeToggle theme={theme} onToggle={toggleTheme} />
+            <Button
+              ref={closeRef}
+              variant="ghost"
+              size="icon"
+              className="icon-button"
+              onClick={() => setOpen(false)}
+              aria-label={t.nav.closeMenu}
+            >
+              <X size={17} aria-hidden="true" />
+            </Button>
           </div>
         </div>
         <div className="mobile-menu-links">
           {sections.map(([label, anchor], index) => (
             <a key={anchor} {...linkProps(anchor)} style={{ "--i": index } as CSSProperties}>
-              <small>{String(index + 1).padStart(2, "0")}</small>{label}
+              <small>{String(index + 1).padStart(2, "0")}</small>
+              {label}
             </a>
           ))}
         </div>
-        <a className="mobile-menu-external" style={{ "--i": sections.length } as CSSProperties} href="https://www.linkedin.com/in/gabrielperina/" target="_blank" rel="noreferrer">LinkedIn <ExternalLink size={14} aria-hidden="true" /></a>
+        <a
+          className="mobile-menu-external"
+          style={{ "--i": sections.length } as CSSProperties}
+          href="https://www.linkedin.com/in/gabrielperina/"
+          target="_blank"
+          rel="noreferrer"
+        >
+          LinkedIn <ExternalLink size={14} aria-hidden="true" />
+        </a>
       </div>
     </header>
   );

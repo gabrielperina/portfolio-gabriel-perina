@@ -1,0 +1,11 @@
+
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "portfolio-gabriel-perina",
+  "compatibility_date": "2026-11-05",
+  "compatibility_flags": ["nodejs_compat"],
+  "main": "src/server.ts",
+  "observability": {
+    "enabled": true
+  }
+}

@@ -249,7 +249,8 @@ h1, h2, h3, h4 { font-family: "Space Grotesk", sans-serif; line-height: 1.14; fo
 .education-topics li { border: 1px solid var(--border); background: var(--background); padding: .35rem .65rem; font-size: .78rem; font-weight: 600; border-radius: 3px; }
 .education-link { white-space: nowrap; align-self: center; }
 .projects-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(250px,1fr)); gap: 1rem; }
-.project-card { background: var(--card); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
+.project-card { background: var(--card); border: 1px solid var(--border); border-radius: 7px; overflow: hidden; box-shadow: 0 10px 30px -26px var(--foreground); transition: transform .3s var(--ease-out), border-color .3s ease, box-shadow .3s ease; }
+.project-card:hover { transform: translateY(-4px); border-color: color-mix(in oklab, var(--accent) 48%, var(--border)); box-shadow: var(--shadow-soft); }
 .project-card img, .project-image-fallback { width: 100%; aspect-ratio: 16/10; object-fit: cover; background: var(--muted); }
 .project-card-content { padding: 1.5rem; display: grid; gap: .8rem; }
 .project-card-content p, .project-story p, .project-story li { color: var(--muted-foreground); line-height: 1.7; }
@@ -337,13 +338,13 @@ h1, h2, h3, h4 { font-family: "Space Grotesk", sans-serif; line-height: 1.14; fo
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: .001ms !important; animation-delay: 0s !important; transition-duration: .001ms !important; }
-   [data-reveal], .hero-enter { opacity: 1 !important; transform: none !important; }
+  [data-reveal], .hero-enter { opacity: 1 !important; transform: none !important; }
 }
 
 /* ===== Refinement layer: theme transition, navigation, skills, reveal ===== */
 :root { --ease-out: cubic-bezier(.22,1,.36,1); --theme-speed: 360ms; --nav-h: 68px; }
-:root { --nav-bg: oklch(0.97 0.005 150 / 78%); }
-.dark { --nav-bg: oklch(0.17 0.02 220 / 76%); }
+:root { --nav-bg: oklch(0.97 0.005 150); }
+.dark { --nav-bg: oklch(0.17 0.02 220); }
 html { scroll-padding-top: calc(var(--nav-h) + 1.25rem); transition: background-color var(--theme-speed) ease; }
 html.menu-open { overflow: hidden; }
 /* Theme: colors only, applied during the toggle so normal hovers stay snappy */
@@ -355,9 +356,9 @@ html.menu-open { overflow: hidden; }
   transition-delay: 0s !important;
 }
 /* Navigation */
-.site-header { position: fixed; inset: 0 0 auto; z-index: 50; border-bottom: 1px solid transparent; transition: border-color .3s ease; }
-.site-header::before { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--nav-bg); backdrop-filter: saturate(140%) blur(12px); -webkit-backdrop-filter: saturate(140%) blur(12px); }
-.nav-shell { animation: nav-in .5s var(--ease-out) both; }
+.site-header { position: fixed; inset: 0 0 auto; z-index: 50; isolation: isolate; border-bottom: 1px solid transparent; background: var(--nav-bg); transition: border-color .3s ease, background-color var(--theme-speed) ease; }
+.site-header::before { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--nav-bg); }
+.nav-shell { position: relative; z-index: 1; animation: nav-in .5s var(--ease-out) both; }
 .site-header.is-scrolled { border-bottom-color: var(--border); }
 @keyframes nav-in { from { opacity: 0; transform: translateY(-8px); } }
 .nav-shell { width: min(1120px, calc(100% - 3rem)); min-height: var(--nav-h); display: flex; justify-content: center; align-items: center; }
@@ -410,9 +411,9 @@ html.menu-open { overflow: hidden; }
 .timeline li:hover .timeline-content h3 { color: var(--accent); }
 /* Skills */
 .skills-grid { display: grid; grid-template-columns: 1.15fr 1.15fr .85fr; gap: 1rem; }
-.skill-card { position: relative; display: grid; grid-template-rows: auto auto 1fr; min-width: 0; padding: 1.5rem; background: var(--card); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; transition: border-color .3s ease, transform .3s var(--ease-out); }
+.skill-card { position: relative; display: grid; grid-template-rows: auto auto 1fr; min-width: 0; padding: 1.5rem; background: var(--card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; box-shadow: 0 10px 30px -28px var(--foreground); transition: border-color .3s ease, transform .3s var(--ease-out), box-shadow .3s ease; }
 .skill-card::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--accent); transform: scaleX(0); transform-origin: left; transition: transform .45s var(--ease-out); }
-.skill-card:hover { border-color: color-mix(in oklab, var(--accent) 45%, var(--border)); }
+.skill-card:hover { border-color: color-mix(in oklab, var(--accent) 45%, var(--border)); transform: translateY(-3px); box-shadow: var(--shadow-soft); }
 .skill-card:hover::before { transform: scaleX(1); }
 .skill-card-top { display: flex; align-items: center; justify-content: space-between; color: var(--accent); }
 .skill-icon { width: 2.6rem; height: 2.6rem; display: grid; place-items: center; border: 1px solid var(--border); border-radius: 5px; background: var(--background); transition: border-color .3s ease, transform .4s var(--ease-out); }
